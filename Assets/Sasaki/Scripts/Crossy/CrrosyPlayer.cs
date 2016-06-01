@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using DG.Tweening;
 
@@ -17,16 +18,17 @@ public class CrrosyPlayer : MonoBehaviour
 	void Awake()
 	{
 		canMove = true;
+		SetPosition (5,0);
 	}
 
 	void Update () {
-		if (Input.GetKeyDown (KeyCode.RightArrow)) {
+		if (Input.GetKeyDown (KeyCode.RightArrow) || InputManager.I.GetDistanceFromInitPos(0).x > 0.1f) {
 			SetPosition(posI+1, posJ);
-		}else if(Input.GetKeyDown(KeyCode.LeftArrow)){
+		}else if(Input.GetKeyDown(KeyCode.LeftArrow) || InputManager.I.GetDistanceFromInitPos(0).x < -0.1f){
 			SetPosition(posI-1, posJ);
-		}else if(Input.GetKeyDown(KeyCode.UpArrow)){
+		}else if(Input.GetKeyDown(KeyCode.UpArrow) || InputManager.I.GetDistanceFromInitPos(0).y > 0.05f){
 			SetPosition(posI, posJ+1);
-		}else if(Input.GetKeyDown(KeyCode.DownArrow)){
+		}else if(Input.GetKeyDown(KeyCode.DownArrow) || InputManager.I.GetDistanceFromInitPos(0).y < -0.05f){
 			SetPosition(posI, posJ-1);
 		}
 
@@ -44,9 +46,13 @@ public class CrrosyPlayer : MonoBehaviour
 		canMove = false;
 		posI = i;
 		posJ = j;
-//		transform.position = new Vector3 (i + i * GroundManager.PADDING, 1, j + j * GroundManager.PADDING);
 		transform.DOJump(new Vector3 (i + i * GroundManager.PADDING, 1, j + j * GroundManager.PADDING),1f,1,0.15f).OnComplete(()=>{
 			canMove = true;
 		});
+	}
+
+	public void OnRestart()
+	{
+		SceneManager.LoadScene ("Crossy");
 	}
 }
