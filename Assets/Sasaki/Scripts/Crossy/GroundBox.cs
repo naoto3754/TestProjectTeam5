@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using DG.Tweening;
 
 public class GroundBox : MonoBehaviour 
 {
@@ -26,5 +27,17 @@ public class GroundBox : MonoBehaviour
 		case GroundManager.State.EMPTY:
 			break;
 		}
+	}
+
+	public void SetDrop(float time)
+	{
+		StartCoroutine (Drop (time));
+	}
+
+	private IEnumerator Drop(float time)
+	{
+		yield return new WaitForSeconds (time);
+		transform.DOMoveY (-100, 2f);
+		_State = GroundManager.State.EMPTY;
 	}
 }

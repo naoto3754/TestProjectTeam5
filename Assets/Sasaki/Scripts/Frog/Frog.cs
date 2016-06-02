@@ -11,6 +11,7 @@ public class Frog : MonoBehaviour
 
 	private bool _IsPowerUp;
 	private Rigidbody2D _Rig;
+	private Vector3 _Direction;
 
 	void Awake ()
 	{
@@ -22,6 +23,7 @@ public class Frog : MonoBehaviour
 		switch(_State)
 		{
 		case State.InAir:
+			_Rig.velocity = _Direction;
 			break;
 		case State.Direction:
 			break;
@@ -39,21 +41,28 @@ public class Frog : MonoBehaviour
 		case State.Direction:
 			_JumpMarker.RotateAround (transform.position, Vector3.forward, Time.deltaTime*300);
 			if (InputManager.I.GetTapDown (0)) {
-				_State = State.Power;
+				Vector3 diff = _JumpMarker.position - transform.position;
+				Jump (diff.normalized, 50f);
+				_State = State.InAir;
+//				_State = State.Power;
+				bool isRed = this.gameObject.layer == LayerMask.NameToLayer ("Red");
+				int layer = isRed ? LayerMask.NameToLayer ("Blue") : LayerMask.NameToLayer ("Red");
+				this.gameObject.layer = layer;
+				GetComponent<Renderer>().material.color = isRed ? Color.blue : Color.red;
 			}
 			break;
 		case State.Power:
-			Vector3 diff = _JumpMarker.position - transform.position;
-			float magni = diff.magnitude;
+			Vector3 diffp = _JumpMarker.position - transform.position;
+			float magni = diffp.magnitude;
 			if (magni < 0.5f)
 				_IsPowerUp = true;
 			else if (magni > 3f)
 				_IsPowerUp = false;
 			float inc = Time.deltaTime*5f*(_IsPowerUp ? 1 : -1);
-			_JumpMarker.position += diff.normalized * inc;
+			_JumpMarker.position += diffp.normalized * inc;
 			if (InputManager.I.GetTapUp (0)) {
 				_State = State.InAir;
-				Jump (diff.normalized, 10*diff.magnitude);
+				Jump (diffp.normalized, 10*diffp.magnitude);
 			}
 			break;
 		}
@@ -62,7 +71,8 @@ public class Frog : MonoBehaviour
 	void Jump(Vector3 direction, float power)
 	{
 		_Rig.constraints = RigidbodyConstraints2D.None;
-		_Rig.velocity = power * direction;
+		_Direction = power * direction;
+//		_Rig.velocity = power * direction;
 	}
 
 	public enum State
@@ -75,6 +85,8 @@ public class Frog : MonoBehaviour
 	void OnCollisionStay2D(Collision2D col)
 	{
 		if (_State == State.InAir) {
+			if (col.gameObject.layer == LayerMask.NameToLayer ("Toge"))
+				OnRestart ();
 			_IsPowerUp = true;
 			_JumpMarker.position = transform.position + 1f * Vector3.up;
 			_State = State.Direction;

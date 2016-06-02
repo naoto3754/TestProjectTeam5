@@ -27,6 +27,7 @@ public class GroundManager : Singleton<GroundManager>
 				GameObject box = Instantiate (_Box, new Vector3(i+i*PADDING, 0, j+j*PADDING), Quaternion.identity) as GameObject;
 				box.transform.SetParent (this.transform);
 				var gbox = box.GetComponent<GroundBox> ();
+				gbox.SetDrop (j+10);
 				int rand = Random.Range (0, 3);
 				if (rand == 0) {
 					gbox.SetState (State.BLACK);
@@ -43,7 +44,7 @@ public class GroundManager : Singleton<GroundManager>
 
 	public bool CanMove(int curI, int curJ, int nextI, int nextJ)
 	{
-		if (curI < 0 || curI >= _Width || curJ < 0 || curJ >= _Height)
+		if (nextI < 0 || nextI >= _Width || nextJ < 0 || nextJ >= _Height)
 			return false;
 			
 		var curBox = _GroundBoxList[curI+curJ*_Width];

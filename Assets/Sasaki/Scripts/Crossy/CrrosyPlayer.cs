@@ -18,7 +18,7 @@ public class CrrosyPlayer : MonoBehaviour
 	void Awake()
 	{
 		canMove = true;
-		SetPosition (5,0);
+		ForceSetPosition (5,0);
 	}
 
 	void Update () {
@@ -49,6 +49,13 @@ public class CrrosyPlayer : MonoBehaviour
 		transform.DOJump(new Vector3 (i + i * GroundManager.PADDING, 1, j + j * GroundManager.PADDING),1f,1,0.15f).OnComplete(()=>{
 			canMove = true;
 		});
+	}
+
+	private void ForceSetPosition(int i, int j)
+	{
+		posI = i;
+		posJ = j;
+		transform.position = new Vector3 (i + i * GroundManager.PADDING, 1, j + j * GroundManager.PADDING);
 	}
 
 	public void OnRestart()
